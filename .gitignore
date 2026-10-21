@@ -1,0 +1,6 @@
+style 3/
+*.csv
+Ultra Clean PNW logo.png
+__pycache__/
+.DS_Store
+Thumbs.db
