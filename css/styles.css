@@ -439,6 +439,28 @@ ul { margin: 0; padding: 0; list-style: none; }
 .site-footer li a:hover { color: var(--blue-600); }
 .footer-bottom { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: .84rem; }
 
+/* BookingKoala embed. embed.js is not loaded. The iframe is a fixed viewport
+   and scrolls internally (scrolling="yes" in the markup). */
+.booking-embed {
+  border: 1px solid var(--line);
+  background: #fff;
+  overflow: hidden;
+}
+.booking-frame {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  border: 0;
+}
+.book-top { background: var(--mist); border-bottom: 1px solid var(--line); padding: 28px 0 22px; }
+.book-top h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); margin-bottom: 8px; }
+.book-top .lead { margin: 0; }
+.book-top .crumbs { margin-bottom: 16px; }
+body.page-book .booking-embed { border-left: 0; border-right: 0; }
+body.page-book .quick-bar { display: none; }
+body.page-book .site-footer { padding-bottom: 28px; }
+
 /* Mobile quick bar */
 .quick-bar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; display: flex; gap: 10px;

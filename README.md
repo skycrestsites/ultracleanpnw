@@ -6,6 +6,7 @@ Static, mobile-first site for Ultra Clean PNW, serving Vancouver, WA, Portland, 
 - `/` home
 - `/services/` all services
 - `/services/<service>/` one page per service (7 total)
+- `/book/` online booking (BookingKoala)
 - `/contact/` quote form
 
 Every page is an `index.html` inside its own folder, so any static host (GitHub Pages, Netlify, Vercel, Cloudflare Pages) serves `/services/deep-cleaning/` without `.html` in the address bar.
@@ -16,6 +17,10 @@ Page content lives in `_src/build.py` (services, copy, FAQs, service areas, cont
     python _src/build.py
 
 Styles are in `css/styles.css`, behavior in `js/main.js`, images in `assets/`.
+
+## Booking
+Online booking is the BookingKoala embed at `https://ultracleanpnw.bookingkoala.com/booknow?embed=true`.
+`embed.js` is intentionally not loaded. The iframe uses a fixed viewport height (`100vh` / `100dvh`) and `scrolling="yes"`, so the form scrolls inside the frame and BookingKoala modals stay in that viewport. Do not add `embed.js` back.
 
 ## Before going live
 1. Domain: canonicals, Open Graph, JSON-LD, `sitemap.xml` and `robots.txt` use `https://ultracleanpnw.com`. Change `SITE` in `_src/build.py` if the domain differs and rebuild.

@@ -13,6 +13,7 @@ NAME = "Ultra Clean PNW"
 EMAIL = "info@ultracleanpnw.com"
 PHONE = ""  # e.g. "(360) 555-0123". Leave blank to hide phone links.
 THEME = "#0a2a4f"
+BOOK_URL = "https://ultracleanpnw.bookingkoala.com/booknow?embed=true"
 
 WA_AREAS = ["Vancouver", "Camas", "Washougal", "Battle Ground", "Ridgefield", "La Center",
             "Brush Prairie", "Hazel Dell", "Salmon Creek", "Felida", "Orchards", "Hockinson"]
@@ -351,6 +352,8 @@ def head(prefix, title, desc, path, jsonld, og_image="assets/og-image.jpg"):
 <link rel="icon" type="image/png" sizes="16x16" href="{prefix}assets/favicon-16.png">
 <link rel="apple-touch-icon" href="{prefix}assets/apple-touch-icon.png">
 <link rel="manifest" href="{prefix}site.webmanifest">
+<link rel="preconnect" href="https://ultracleanpnw.bookingkoala.com" crossorigin>
+<link rel="dns-prefetch" href="https://ultracleanpnw.bookingkoala.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
@@ -360,13 +363,14 @@ def head(prefix, title, desc, path, jsonld, og_image="assets/og-image.jpg"):
 """
 
 
-def header(prefix, active=""):
+def header(prefix, active="", body_class=""):
     def cur(key):
         return ' aria-current="page"' if key == active else ""
     drop = "\n".join(f'<a href="{prefix}services/{s["slug"]}/"{cur(s["slug"])}>{s["nav"]}</a>' for s in SERVICES)
     mob = "\n".join(f'<a href="{prefix}services/{s["slug"]}/">{s["nav"]}</a>' for s in SERVICES)
     home = prefix or "./"
-    return f"""<body>
+    body = f' class="{body_class}"' if body_class else ""
+    return f"""<body{body}>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container header-inner">
@@ -388,7 +392,7 @@ def header(prefix, active=""):
         <li><a class="nav-link" href="{prefix}contact/"{cur("contact")}>Contact</a></li>
       </ul>
     </nav>
-    <a class="btn btn-primary header-cta" href="{prefix}contact/">Get a Free Quote</a>
+    <a class="btn btn-primary header-cta" href="{prefix}book/">Book Now</a>
     <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
       {icon("menu", "icon-open")}{icon("x", "icon-close")}
     </button>
@@ -405,7 +409,8 @@ def header(prefix, active=""):
   <a href="{prefix}#areas">Service Areas</a>
   <a href="{prefix}#about">About</a>
   <a href="{prefix}contact/">Contact</a>
-  <a class="btn btn-primary" href="{prefix}contact/">Get a Free Quote</a>
+  <a href="{prefix}book/">Book Online</a>
+  <a class="btn btn-primary" href="{prefix}book/">Book Now</a>
 </nav>
 <main id="main">
 """
@@ -436,6 +441,7 @@ def footer(prefix):
           <li><a href="{prefix}#about">About Us</a></li>
           <li><a href="{prefix}#areas">Service Areas</a></li>
           <li><a href="{prefix}services/">All Services</a></li>
+          <li><a href="{prefix}book/">Book Online</a></li>
           <li><a href="{prefix}contact/">Request a Quote</a></li>
         </ul>
       </div>
@@ -456,7 +462,7 @@ def footer(prefix):
   </div>
 </footer>
 <div class="quick-bar" aria-label="Quick actions">
-  <a class="btn btn-primary" href="{prefix}contact/">Free Quote</a>
+  <a class="btn btn-primary" href="{prefix}book/">Book Now</a>
   {qb_second}
 </div>
 <script src="{prefix}js/main.js" defer></script>
@@ -496,8 +502,17 @@ def quote_form(heading="Request a free quote", sub="Tell us a little about your 
 </div>"""
 
 
-def cta_band(prefix, title="Ready for a cleaner space?", text="Tell us about your home or business and get a clear, no-obligation quote from the Ultra Clean PNW team.", service=""):
-    q = f"?service={service}" if service else ""
+def booking_embed(lazy=True):
+    """BookingKoala iframe only. embed.js is intentionally not loaded: no iframe-resizer
+    can grow the frame or force scrolling=\"no\". A fixed viewport height plus
+    scrolling=\"yes\" keeps form scroll and BookingKoala modals inside the iframe."""
+    loading = ' loading="lazy"' if lazy else ""
+    return f"""<div class="booking-embed">
+  <iframe class="booking-frame" src="{BOOK_URL}" title="Book a cleaning with Ultra Clean PNW" scrolling="yes"{loading}></iframe>
+</div>"""
+
+
+def cta_band(prefix, title="Ready for a cleaner space?", text="Book online in a few clicks, or tell us about your home or business and we will follow up with a clear quote.", service=""):
     return f"""<section class="cta-band">
   {img(prefix, "forest", "", lazy=True)}
   <div class="container">
@@ -505,8 +520,8 @@ def cta_band(prefix, title="Ready for a cleaner space?", text="Tell us about you
     <h2>{title}</h2>
     <p>{text}</p>
     <div class="btn-row">
-      <a class="btn btn-blue" href="{prefix}contact/{q}">Get a Free Quote {icon("arrow")}</a>
-      <a class="btn btn-ghost-light" href="{prefix}services/">Explore Services</a>
+      <a class="btn btn-blue" href="{prefix}book/">Book Now {icon("arrow")}</a>
+      <a class="btn btn-ghost-light" href="{prefix}contact/">Request a Quote</a>
     </div>
   </div>
 </section>"""
@@ -583,7 +598,7 @@ def build_home():
     orr = "".join(f"<li>{c}</li>" for c in OR_AREAS)
     faqs = [
         ("What areas do you serve?", "We serve Vancouver, WA and surrounding Clark County communities like Camas, Washougal, Battle Ground and Ridgefield, plus Portland, OR and nearby cities including Beaverton, Hillsboro, Lake Oswego, Tigard and Gresham. If you are close by and do not see your city listed, reach out and ask."),
-        ("How do I get a quote?", "Fill out the quote form or send us an email with your address, the size of your space and the service you need. We will follow up with a clear quote, usually within one business day."),
+        ("How do I book a cleaning?", "Use the online booking form to choose a service, see pricing and pick a time. You can also send a quote request with your address, the size of your space and the service you need, and we will follow up within one business day."),
         ("Do I need to be home during the cleaning?", "No. Many clients provide a door code, lockbox or key. Whatever works best for you, we will make sure your home is secured when we leave."),
         ("Do you bring your own supplies and equipment?", "Yes. Our team arrives with professional supplies and equipment. If you prefer specific products, let us know and we are happy to use them."),
         ("What is the difference between a standard clean and a deep clean?", "A standard clean maintains a home that is already in good shape. A deep clean adds detailed work like baseboards, grout, fixtures, vents and built-up grime. We usually recommend a deep clean for a first visit."),
@@ -602,7 +617,7 @@ def build_home():
       <h1>A cleaner home, <span class="accent">from Vancouver to Portland.</span></h1>
       <p class="lead">Ultra Clean PNW delivers detailed residential and commercial cleaning across the Pacific Northwest. Reliable crews, clear quotes and a clean you notice the moment you walk in.</p>
       <div class="btn-row">
-        <a class="btn btn-primary" href="contact/">Get a Free Quote {icon("arrow")}</a>
+        <a class="btn btn-primary" href="book/">Book Now {icon("arrow")}</a>
         <a class="btn btn-outline" href="services/">View Services</a>
       </div>
       <ul class="hero-points">
@@ -676,7 +691,7 @@ def build_home():
       <p class="lead">Three quick steps from first message to a spotless space.</p>
     </div>
     <div class="steps">
-      <div class="step reveal"><span class="step-num">STEP 01</span><span class="ico">{icon("message")}</span><h3>Request a quote</h3><p>Share a few details about your space, the service you need and your preferred timing.</p></div>
+      <div class="step reveal"><span class="step-num">STEP 01</span><span class="ico">{icon("message")}</span><h3>Book online</h3><p>Choose your service, share a few details about your space and pick a time that works.</p></div>
       <div class="step reveal"><span class="step-num">STEP 02</span><span class="ico">{icon("calendar")}</span><h3>Pick your schedule</h3><p>We confirm your price and checklist, then book a time that works for you, one time or recurring.</p></div>
       <div class="step reveal"><span class="step-num">STEP 03</span><span class="ico">{icon("sparkles")}</span><h3>Enjoy the clean</h3><p>Our team arrives prepared, works through every room and leaves your space fresh and ready.</p></div>
     </div>
@@ -709,6 +724,17 @@ def build_home():
       <h2>Questions we hear often</h2>
     </div>
     {faq_block(faqs)}
+  </div>
+</section>
+
+<section class="section alt" id="book">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow center">Book online</span>
+      <h2>Book your cleaning in a few clicks</h2>
+      <p class="lead">Choose your service, see your price and lock in a time. Prefer to talk it through first? The quote form is just below.</p>
+    </div>
+    {booking_embed()}
   </div>
 </section>
 
@@ -746,7 +772,7 @@ def build_services_index():
     <ul class="checks">{"".join(f'<li>{icon("check")}<span>{it}</span></li>' for it in s["included"][0][2][:3])}</ul>
     <div class="btn-row">
       <a class="btn btn-primary" href="{s['slug']}/">View {s['nav']} {icon("arrow")}</a>
-      <a class="btn btn-outline" href="../contact/?service={s['slug']}">Get a Quote</a>
+      <a class="btn btn-outline" href="../book/">Book Now</a>
     </div>
   </div>
 </article>""")
@@ -810,7 +836,7 @@ def build_service(s):
         <h1>{s['h1']}</h1>
         <p class="lead">{s['intro']}</p>
         <div class="btn-row">
-          <a class="btn btn-primary" href="../../contact/?service={s['slug']}">Get a Free Quote {icon("arrow")}</a>
+          <a class="btn btn-primary" href="../../book/">Book Now {icon("arrow")}</a>
           <a class="btn btn-outline" href="#included">What's Included</a>
         </div>
       </div>
@@ -830,14 +856,14 @@ def build_service(s):
     </div>
     <aside class="sticky reveal">
       <div class="aside-card">
-        <h3>Get your free quote</h3>
-        <p>Share a few details and we will send a clear price and available times.</p>
+        <h3>Book this service</h3>
+        <p>Choose a time online and see pricing before you confirm. You can still request a quote if you would rather we follow up.</p>
         <ul>
-          <li>{icon("check")}Free, no-obligation quote</li>
+          <li>{icon("check")}Book in a few clicks</li>
           <li>{icon("check")}Supplies and equipment included</li>
           <li>{icon("check")}Serving Vancouver and Portland</li>
         </ul>
-        <a class="btn btn-blue" href="../../contact/?service={s['slug']}">Request a Quote {icon("arrow")}</a>
+        <a class="btn btn-blue" href="../../book/">Book Now {icon("arrow")}</a>
       </div>
     </aside>
   </div>
@@ -889,6 +915,28 @@ def build_service(s):
 """
     html += footer(p)
     write(f"services/{s['slug']}/index.html", html)
+
+
+# ---------------------------------------------------------------- book
+def build_book():
+    p = "../"
+    title = "Book a Cleaning Online | Ultra Clean PNW"
+    desc = "Book Ultra Clean PNW online. Choose a service, see pricing and pick a time for house, commercial, move-out or rental cleaning in Vancouver, WA and Portland, OR."
+    ld = [crumbs_ld([("Home", "/"), ("Book", "/book/")])]
+    html = head(p, title, desc, "/book/", ld)
+    html += header(p, "book", "page-book")
+    html += f"""
+<section class="book-top">
+  <div class="container">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="../">Home</a>{icon("chev-right")}<span>Book</span></nav>
+    <h1>Book your cleaning</h1>
+    <p class="lead">Choose a service, see your price and pick a time. The form scrolls inside this window.</p>
+  </div>
+</section>
+{booking_embed(lazy=False)}
+"""
+    html += footer(p)
+    write("book/index.html", html)
 
 
 # ---------------------------------------------------------------- contact
@@ -960,8 +1008,8 @@ def build_404():
 
 # ---------------------------------------------------------------- seo files
 def build_seo_files(date="2026-10-20"):
-    urls = ["/", "/services/", "/contact/"] + [f"/services/{s['slug']}/" for s in SERVICES]
-    pr = {"/": "1.0", "/services/": "0.9", "/contact/": "0.7"}
+    urls = ["/", "/services/", "/book/", "/contact/"] + [f"/services/{s['slug']}/" for s in SERVICES]
+    pr = {"/": "1.0", "/services/": "0.9", "/book/": "0.9", "/contact/": "0.7"}
     items = "\n".join(f"""  <url>
     <loc>{SITE}{u}</loc>
     <lastmod>{date}</lastmod>
@@ -986,7 +1034,8 @@ if __name__ == "__main__":
     build_services_index()
     for s in SERVICES:
         build_service(s)
+    build_book()
     build_contact()
     build_404()
-    build_seo_files()
-    print("Built", 4 + len(SERVICES), "pages")
+    build_seo_files("2026-11-04")
+    print("Built", 5 + len(SERVICES), "pages")
