@@ -10,7 +10,7 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://ultracleanpnw.com"
 NAME = "Ultra Clean PNW"
-EMAIL = "info@ultracleanpnw.com"
+EMAIL = "contact@ultracleanpnw.com"
 PHONE = ""  # e.g. "(360) 555-0123". Leave blank to hide phone links.
 THEME = "#0a2a4f"
 BOOK_URL = "https://ultracleanpnw.bookingkoala.com/booknow?embed=true"
@@ -457,7 +457,7 @@ def footer(prefix):
     </div>
     <div class="footer-bottom">
       <span>&copy; <span data-year>2026</span> {NAME}. All rights reserved.</span>
-      <span>Serving both sides of the Columbia River.</span>
+      <span class="footer-legal"><a href="{prefix}privacy/">Privacy Policy</a><a href="{prefix}terms/">Terms of Service</a></span>
     </div>
   </div>
 </footer>
@@ -480,7 +480,7 @@ def service_options(selected=""):
     return "\n".join(opts)
 
 
-def quote_form(heading="Request a free quote", sub="Tell us a little about your space and we will follow up with a quote, usually within one business day."):
+def quote_form(heading="Request a free quote", sub="Tell us a little about your space and we will follow up with a quote, usually within one business day.", prefix=""):
     return f"""<div class="form-card">
   <h3>{heading}</h3>
   <p>{sub}</p>
@@ -496,7 +496,7 @@ def quote_form(heading="Request a free quote", sub="Tell us a little about your 
       <div class="field full"><label for="f-message">Tell us about your space</label><textarea id="f-message" name="message" placeholder="Home or office size, number of bedrooms and bathrooms, preferred dates, anything we should know."></textarea></div>
     </div>
     <button class="btn btn-blue" type="submit">Send My Request {icon("arrow")}</button>
-    <p class="form-note">No obligation. We never share your information.</p>
+    <p class="form-note">No obligation. Read our <a href="{prefix}privacy/">privacy policy</a>.</p>
     <div class="form-status" role="status" aria-live="polite"></div>
   </form>
 </div>"""
@@ -939,6 +939,124 @@ def build_book():
     write("book/index.html", html)
 
 
+# ---------------------------------------------------------------- legal
+def legal_page(slug, crumb, title, desc, h1, intro, sections):
+    p = "../"
+    path = f"/{slug}/"
+    body = []
+    for heading, paragraphs in sections:
+        body.append(f"<h2>{heading}</h2>")
+        for para in paragraphs:
+            if para.startswith("<ul>"):
+                body.append(para)
+            else:
+                body.append(f"<p>{para}</p>")
+    ld = [crumbs_ld([("Home", "/"), (crumb, path)])]
+    html = head(p, title, desc, path, ld)
+    html += header(p, slug)
+    html += f"""
+<section class="page-hero simple">
+  <div class="container">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="../">Home</a>{icon("chev-right")}<span>{crumb}</span></nav>
+    <h1>{h1}</h1>
+    <p class="lead">{intro}</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container legal">
+    <p class="updated">Effective November 17, 2026</p>
+    {"".join(body)}
+  </div>
+</section>
+"""
+    html += footer(p)
+    write(f"{slug}/index.html", html)
+
+
+def build_privacy():
+    legal_page(
+        "privacy",
+        "Privacy Policy",
+        "Privacy Policy | Ultra Clean PNW",
+        "How Ultra Clean PNW collects, uses, and shares information when you request a quote, book a cleaning, or email us.",
+        "Privacy Policy",
+        "This policy explains what Ultra Clean PNW collects through this website and how that information is used.",
+        [
+            ("Who we are", [
+                f'{NAME} provides residential and commercial cleaning in Vancouver, WA, Portland, OR, and nearby communities. Questions about this policy can be sent to <a href="mailto:{EMAIL}">{EMAIL}</a>.',
+            ]),
+            ("Information we collect", [
+                "The quote form asks for your name, email, phone number, city or ZIP code, the service you are interested in, and any details you choose to write. That form opens your own email app and sends the message to us. This website does not store the form on a server.",
+                "Online booking is handled by BookingKoala at ultracleanpnw.bookingkoala.com. Information you enter there, such as your contact details, address, service choices, and appointment time, is collected by that booking system so the visit can be scheduled.",
+                "If you email or call us, we keep the message and the contact details you provide so we can reply and complete the work.",
+                "Like most websites, our host and your browser may record basic technical data such as IP address, browser type, and the pages requested. We use that only to keep the site working.",
+            ]),
+            ("How we use information", [
+                "<ul><li>Reply to quote requests and questions</li><li>Schedule, confirm, and complete cleanings</li><li>Send appointment details and service updates you asked for</li><li>Improve the website and protect it from misuse</li><li>Meet legal or accounting duties that apply to the business</li></ul>",
+                "We do not sell your personal information.",
+            ]),
+            ("Who we share it with", [
+                "We share information with the people and services needed to do the job. That includes the cleaning team assigned to your visit and BookingKoala, which runs the online booking form.",
+                "This site loads fonts from Google Fonts. Your browser contacts Google when those font files are requested. BookingKoala may use its own cookies and similar tools inside the booking window. Their practices are described in BookingKoala's own policy.",
+                "We may also share information if the law requires it, or to protect our customers, our team, or the business.",
+            ]),
+            ("How long we keep it", [
+                "Quote emails, booking records, and related messages are kept for as long as needed to provide the service, handle follow-up, and meet tax or record-keeping duties. You can ask us to delete information we no longer need to keep.",
+            ]),
+            ("Your choices", [
+                f'You can ask what contact information we have about you, ask us to correct it, or ask us to delete it, by emailing <a href="mailto:{EMAIL}">{EMAIL}</a>. Some records may need to stay in place for a booking that is still open or for a legal duty.',
+                "You can stop marketing messages at any time. Service messages about a booked visit, such as a schedule change, may still be sent.",
+            ]),
+            ("Children", [
+                "This website is for adults booking cleaning services. We do not knowingly collect information from children under 13.",
+            ]),
+            ("Changes", [
+                "If this policy changes, the updated version will be posted on this page with a new effective date.",
+            ]),
+        ],
+    )
+
+
+def build_terms():
+    legal_page(
+        "terms",
+        "Terms of Service",
+        "Terms of Service | Ultra Clean PNW",
+        "Terms for using the Ultra Clean PNW website and for requesting or booking residential and commercial cleaning.",
+        "Terms of Service",
+        "These terms cover use of the Ultra Clean PNW website and requests for cleaning services in our service area.",
+        [
+            ("Using this website", [
+                "The pages on ultracleanpnw.com describe our services and let you request a quote or book a visit. You agree to use the site lawfully and not to interfere with it, attempt to break it, or submit information you know is false.",
+                "Service descriptions are a general guide. The exact scope of a visit is the checklist confirmed in your quote or booking.",
+            ]),
+            ("Quotes and bookings", [
+                "A quote request is not a confirmed appointment. We will follow up with availability and price. An appointment is confirmed when it is booked through the online booking form or when we confirm it with you directly.",
+                "Online booking is provided through BookingKoala. The price, service, date, and any conditions shown during checkout apply to that appointment.",
+                "If you need to reschedule or cancel, contact us as soon as you can. A cancellation window or fee, if one applies, will be shown in the booking flow or told to you before you confirm.",
+            ]),
+            ("Your home or workplace", [
+                "<ul><li>Provide safe access, such as a door code, lockbox, or someone on site</li><li>Secure valuables and tell us about pets, alarms, fragile items, or areas to skip</li><li>Tell us about hazards, including construction, pest issues, or sewage problems, before the visit</li><li>Make sure water and power are available when the work needs them</li></ul>",
+                "We can pause or decline a visit if a space is unsafe or is not in the condition described when it was booked.",
+            ]),
+            ("Payment", [
+                "Payment terms are shown when you book or when we send a quote. Online payments are processed by the booking system, not stored on this website.",
+            ]),
+            ("Service area", [
+                "We serve Vancouver, WA, Portland, OR, and the surrounding communities listed on the website. If your address is outside that area, we will say so before an appointment is confirmed.",
+            ]),
+            ("Limits", [
+                "Cleaning improves the condition of a space. It does not repair damage, remove every stain, or guarantee a particular result where a surface is worn, damaged, or permanently soiled.",
+                "To the extent the law allows, Ultra Clean PNW is not liable for indirect or consequential losses. Nothing in these terms limits rights that cannot be waived under Washington or Oregon law.",
+            ]),
+            ("Changes", [
+                "We may update these terms by posting a new version on this page. The version in effect on the date you book applies to that appointment.",
+                f'Questions about these terms can be sent to <a href="mailto:{EMAIL}">{EMAIL}</a>.',
+            ]),
+        ],
+    )
+
+
 # ---------------------------------------------------------------- contact
 def build_contact():
     p = "../"
@@ -975,7 +1093,7 @@ def build_contact():
         <div class="main">{img(p, "pnw-home", "Pacific Northwest home with a clean front porch")}</div>
       </div>
     </div>
-    <div>{quote_form()}</div>
+    <div>{quote_form(prefix="../")}</div>
   </div>
 </section>
 """
@@ -1008,8 +1126,8 @@ def build_404():
 
 # ---------------------------------------------------------------- seo files
 def build_seo_files(date="2026-10-20"):
-    urls = ["/", "/services/", "/book/", "/contact/"] + [f"/services/{s['slug']}/" for s in SERVICES]
-    pr = {"/": "1.0", "/services/": "0.9", "/book/": "0.9", "/contact/": "0.7"}
+    urls = ["/", "/services/", "/book/", "/contact/", "/privacy/", "/terms/"] + [f"/services/{s['slug']}/" for s in SERVICES]
+    pr = {"/": "1.0", "/services/": "0.9", "/book/": "0.9", "/contact/": "0.7", "/privacy/": "0.3", "/terms/": "0.3"}
     items = "\n".join(f"""  <url>
     <loc>{SITE}{u}</loc>
     <lastmod>{date}</lastmod>
@@ -1035,7 +1153,9 @@ if __name__ == "__main__":
     for s in SERVICES:
         build_service(s)
     build_book()
+    build_privacy()
+    build_terms()
     build_contact()
     build_404()
-    build_seo_files("2026-11-04")
-    print("Built", 5 + len(SERVICES), "pages")
+    build_seo_files("2026-11-17")
+    print("Built", 7 + len(SERVICES), "pages")

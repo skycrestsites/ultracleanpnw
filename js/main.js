@@ -1,5 +1,5 @@
 (function () {
-  var CONTACT_EMAIL = "info@ultracleanpnw.com";
+  var CONTACT_EMAIL = "contact@ultracleanpnw.com";
   var root = document.documentElement;
   root.classList.remove("no-js");
 

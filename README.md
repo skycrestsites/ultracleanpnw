@@ -8,6 +8,8 @@ Static, mobile-first site for Ultra Clean PNW, serving Vancouver, WA, Portland, 
 - `/services/<service>/` one page per service (7 total)
 - `/book/` online booking (BookingKoala)
 - `/contact/` quote form
+- `/privacy/` privacy policy
+- `/terms/` terms of service
 
 Every page is an `index.html` inside its own folder, so any static host (GitHub Pages, Netlify, Vercel, Cloudflare Pages) serves `/services/deep-cleaning/` without `.html` in the address bar.
 

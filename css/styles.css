@@ -437,7 +437,19 @@ ul { margin: 0; padding: 0; list-style: none; }
 .site-footer li { padding: 5px 0; }
 .site-footer li a, .site-footer li span { color: var(--muted); }
 .site-footer li a:hover { color: var(--blue-600); }
-.footer-bottom { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: .84rem; }
+.footer-bottom { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: .84rem; }
+.footer-legal { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.footer-legal a { color: var(--navy); font-weight: 600; }
+.footer-legal a:hover { color: var(--blue-600); }
+.form-note a { color: var(--blue-600); font-weight: 600; }
+
+.legal { max-width: 760px; }
+.legal h2 { font-size: 1.2rem; margin: 2.1rem 0 .55rem; }
+.legal p, .legal li { color: #33475c; }
+.legal ul { list-style: disc; padding-left: 1.25rem; margin: 0 0 1rem; }
+.legal li { margin: .35rem 0; }
+.legal a { color: var(--blue-600); font-weight: 600; }
+.legal .updated { color: var(--muted); font-size: .92rem; margin-bottom: 1.4rem; }
 
 /* BookingKoala embed. embed.js is not loaded. The iframe is a fixed viewport
    and scrolls internally (scrolling="yes" in the markup). */
